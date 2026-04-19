@@ -54,54 +54,108 @@
   </div>
 
  <script>
-  function randomChoice(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
+function randomChoice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// More aggressive chaos generator
+window.toChaos = function () {
+  let text = document.getElementById("input").value.toLowerCase();
+
+  // Phrase-level replacements first (this is key)
+  const phrases = [
+    { from: /i am/g, to: ["i'm", "im"] },
+    { from: /i do not/g, to: ["i don't"] },
+    { from: /going to/g, to: ["gonna"] },
+    { from: /want to/g, to: ["wanna"] },
+    { from: /let me/g, to: ["lemme"] },
+    { from: /kind of/g, to: ["kinda"] },
+    { from: /do you/g, to: ["u"] },
+    { from: /are you/g, to: ["u"] }
+  ];
+
+  phrases.forEach(p => {
+    text = text.replace(p.from, randomChoice(p.to));
+  });
+
+  // Word replacements
+  const words = {
+    "you": ["u", "bestie"],
+    "are": ["r"],
+    "please": ["plz"],
+    "really": ["fr", "lowkey"],
+    "hello": ["hey", "yo"],
+    "hi": ["hey"],
+    "no": ["nah", "nooo"],
+    "yes": ["yesss", "ya"],
+    "my": ["myyy"],
+    "friend": ["bestie"],
+    "okay": ["ok", "okayy"]
+  };
+
+  for (let key in words) {
+    let regex = new RegExp("\\b" + key + "\\b", "g");
+    text = text.replace(regex, randomChoice(words[key]));
   }
 
-  window.toChaos = function () {
-    let text = document.getElementById("input").value;
+  // Random chaos injections
+  const chaosBits = [
+    " not me",
+    " i can't",
+    " why is this me",
+    " pls",
+    " send help"
+  ];
 
-    let replacements = {
-      "you": ["u", "bestie"],
-      "are": ["r"],
-      "please": ["plz"],
-      "really": ["fr", "lowkey"],
-      "going to": ["gonna"]
-    };
+  if (Math.random() > 0.5) {
+    text += randomChoice(chaosBits);
+  }
 
-    text = text.toLowerCase();
+  // Ending spam
+  const endings = [
+    " 😭",
+    " 💀",
+    " 😩",
+    " ✨",
+    " fr",
+    " no cap"
+  ];
 
-    for (let key in replacements) {
-      let regex = new RegExp("\\b" + key + "\\b", "g");
-      text = text.replace(regex, randomChoice(replacements[key]));
-    }
+  text += randomChoice(endings);
 
-    let endings = [" 😭", " 💀", " fr", " no cap", " 😩"];
-    text += randomChoice(endings);
+  document.getElementById("output").innerText = text;
+};
 
-    document.getElementById("output").innerText = text;
-  };
+// MUCH smarter cleanup
+window.toAdult = function () {
+  let text = document.getElementById("input").value;
 
-  window.toAdult = function () {
-    let text = document.getElementById("input").value;
+  const cleanup = [
+    { from: /\bu\b/g, to: "you" },
+    { from: /\br\b/g, to: "are" },
+    { from: /\bfr\b/g, to: "really" },
+    { from: /\bnah\b/g, to: "no" },
+    { from: /\bya\b/g, to: "yes" },
+    { from: /\bgonna\b/g, to: "going to" },
+    { from: /\bwanna\b/g, to: "want to" },
+    { from: /\blemme\b/g, to: "let me" },
+    { from: /\blowkey\b/g, to: "somewhat" },
+    { from: /\bbestie\b/g, to: "" }
+  ];
 
-    let cleanup = {
-      "u": "you",
-      "r": "are",
-      "fr": "really",
-      "nah": "no",
-      "lol": ""
-    };
+  cleanup.forEach(c => {
+    text = text.replace(c.from, c.to);
+  });
 
-    text = text.toLowerCase();
+  // Remove emojis & chaos phrases
+  text = text.replace(/[😭💀😩✨]/g, "");
+  text = text.replace(/no cap|i can't|send help|not me/gi, "");
 
-    for (let key in cleanup) {
-      let regex = new RegExp(key, "g");
-      text = text.replace(regex, cleanup[key]);
-    }
+  // Clean spacing
+  text = text.replace(/\s+/g, " ").trim();
 
-    document.getElementById("output").innerText = text;
-  };
+  document.getElementById("output").innerText = text;
+};
 </script>
 </body>
 </html>
